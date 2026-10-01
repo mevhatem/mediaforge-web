@@ -598,20 +598,21 @@ async function loadFFmpeg() {
         }
     });
 
-    const coreBaseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
+    const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
+    const ffmpegBaseURL = 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm';
 
-    console.log("Loading FFmpeg from CDN (jsDelivr)...");
+    console.log("Loading FFmpeg from CDN (unpkg)...");
     try {
-        const coreBlobURL = await fetchWithProgress(`${coreBaseURL}/ffmpeg-core.js`, 'text/javascript');
+        const coreBlobURL = await fetchWithProgress(`${baseURL}/ffmpeg-core.js`, 'text/javascript');
         
         ui.processDetail.textContent = 'Downloading WASM binaries (0%)';
-        const wasmBlobURL = await fetchWithProgress(`${coreBaseURL}/ffmpeg-core.wasm`, 'application/wasm', (pct) => {
+        const wasmBlobURL = await fetchWithProgress(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm', (pct) => {
             ui.processDetail.textContent = `Downloading WASM binaries (${pct}%)`;
             ui.progressBar.style.width = `${pct}%`;
             if (ui.progressText) ui.progressText.textContent = `${pct}%`;
         });
         
-        const workerBlobURL = await toBlobURL('https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/worker.js', 'text/javascript');
+        const workerBlobURL = await fetchWithProgress(`${ffmpegBaseURL}/worker.js`, 'text/javascript');
         
         // Pass standard coreURL, wasmURL, and workerURL directly
         await ffmpeg.load({
