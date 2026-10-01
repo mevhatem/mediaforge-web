@@ -576,7 +576,7 @@ async function loadFFmpeg() {
         await ffmpeg.load({
             coreURL: `${localBase}/ffmpeg-core.js`,
             wasmURL: `${localBase}/ffmpeg-core.wasm`,
-            classWorkerURL: `${localBase}/814.ffmpeg.js`
+            classWorkerURL: `${localBase}/worker.js`
         });
         
         console.log("FFmpeg fully loaded!");
@@ -714,6 +714,7 @@ async function processFiles() {
             
             console.log("Starting ffmpeg.exec...");
             // Run conversion
+            let crashed = false;
             try {
                 await ffmpeg.exec(args);
                 console.log("Finished exec!");
@@ -723,9 +724,12 @@ async function processFiles() {
                     // If the file exists, the crash was just a logging/metadata artifact
                     await ffmpeg.readFile(outputSafeName);
                     console.warn("Output file successfully generated! Proceeding despite the crash.");
+                    crashed = true;
                 } catch (readError) {
                     // File does not exist, it was a real conversion failure
                     if (statusEl) statusEl.textContent = "Error";
+                    isFfmpegLoaded = false;
+                    try { ffmpeg.terminate(); } catch(e) {}
                     throw execError; 
                 }
             }
@@ -737,6 +741,18 @@ async function processFiles() {
             // Clean up virtual FS memory
             await ffmpeg.deleteFile(inputName);
             await ffmpeg.deleteFile(outputSafeName);
+            
+            // If WASM crashed on exit, the instance is corrupted. Terminate and reload.
+            if (crashed) {
+                console.warn("Terminating corrupted FFmpeg instance...");
+                isFfmpegLoaded = false;
+                try { ffmpeg.terminate(); } catch(e) {}
+                
+                if (i < totalFilesCount - 1) {
+                    console.log("Reloading FFmpeg for the next file in batch...");
+                    await loadFFmpeg();
+                }
+            }
         }
 
         if (statusEl) statusEl.textContent = "Done";
