@@ -598,8 +598,8 @@ async function loadFFmpeg() {
         }
     });
 
-    const coreBase = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
-    const ffmpegBase = 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd';
+    const coreBase = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
+    const ffmpegBase = 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd';
 
     console.log("Loading FFmpeg from CDN (unpkg)...");
     try {
