@@ -571,10 +571,12 @@ async function loadFFmpeg() {
 
     console.log("Loading FFmpeg locally...");
     try {
+        const localBase = window.location.origin + '/ffmpeg';
+
         await ffmpeg.load({
-            coreURL: '/ffmpeg/ffmpeg-core.js',
-            wasmURL: '/ffmpeg/ffmpeg-core.wasm',
-            classWorkerURL: '/ffmpeg/814.ffmpeg.js'
+            coreURL: `${localBase}/ffmpeg-core.js`,
+            wasmURL: `${localBase}/ffmpeg-core.wasm`,
+            classWorkerURL: `${localBase}/814.ffmpeg.js`
         });
         
         console.log("FFmpeg fully loaded!");
