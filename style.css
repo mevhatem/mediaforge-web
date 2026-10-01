@@ -505,13 +505,12 @@ button { border: none; font-family: inherit; font-size: 1rem; cursor: pointer; }
     padding-right: 0.5rem;
 }
 
-/* Sticky Ad Container */
 .sticky-ad-container {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    display: flex;
+    display: none; /* Gizlendi: AdSense onayı gelince açılacak */
     justify-content: center;
     background: rgba(18, 18, 18, 0.8);
     backdrop-filter: blur(12px);
@@ -533,4 +532,64 @@ button { border: none; font-family: inherit; font-size: 1rem; cursor: pointer; }
     background: transparent;
     border-left: 1px dashed rgba(255, 255, 255, 0.05);
     border-right: 1px dashed rgba(255, 255, 255, 0.05);
+}
+
+/* Features Grid (Neler Yapabilirsiniz?) */
+.features-section {
+    margin-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 1.5rem;
+}
+.features-header {
+    text-align: center;
+    margin-bottom: 1.25rem;
+}
+.features-header h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #e5e7eb;
+    margin-bottom: 0.25rem;
+}
+.features-header p {
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+.feature-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.25s ease;
+}
+.feature-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(139, 92, 246, 0.3);
+    transform: translateY(-2px);
+}
+.feature-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+}
+.feature-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #f3f4f6;
+    margin-bottom: 0.35rem;
+}
+.feature-desc {
+    font-size: 0.775rem;
+    color: #9ca3af;
+    line-height: 1.4;
 }
