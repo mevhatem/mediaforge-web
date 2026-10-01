@@ -562,10 +562,12 @@ async function fetchWithProgress(url, type, onProgress) {
         if (done) break;
         chunks.push(value);
         receivedLength += value.length;
-        if (contentLength && onProgress) {
-            onProgress(Math.round((receivedLength / contentLength) * 100));
+        if (onProgress) {
+            let percent = contentLength ? Math.min(99, Math.round((receivedLength / contentLength) * 100)) : Math.min(99, Math.round((receivedLength / (30 * 1024 * 1024)) * 100));
+            onProgress(percent);
         }
     }
+    if (onProgress) onProgress(100);
     const blob = new Blob(chunks, { type });
     return URL.createObjectURL(blob);
 }
@@ -617,6 +619,8 @@ async function loadFFmpeg() {
             wasmURL,
             classWorkerURL: workerURL
         });
+        
+        ui.processDetail.textContent = 'Initializing engine...';
         console.log("FFmpeg loaded successfully!");
         isFfmpegLoaded = true;
     } catch (error) {
