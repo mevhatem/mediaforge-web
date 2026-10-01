@@ -573,13 +573,20 @@ async function loadFFmpeg() {
     const ffmpegBaseURL = 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm';
 
     console.log("Loading FFmpeg from CDN...");
-    await ffmpeg.load({
-        coreURL: await toBlobURL(`${coreBaseURL}/ffmpeg-core.js`, 'text/javascript'),
-        wasmURL: await toBlobURL(`${coreBaseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-        classWorkerURL: await toBlobURL(`${ffmpegBaseURL}/worker.js`, 'text/javascript')
-    });
-    console.log("FFmpeg loaded!");
-    isFfmpegLoaded = true;
+    try {
+        await ffmpeg.load({
+            coreURL: await toBlobURL(`${coreBaseURL}/ffmpeg-core.js`, 'text/javascript'),
+            wasmURL: await toBlobURL(`${coreBaseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+            classWorkerURL: await toBlobURL(`${ffmpegBaseURL}/worker.js`, 'text/javascript')
+        });
+        console.log("FFmpeg loaded!");
+        isFfmpegLoaded = true;
+    } catch (error) {
+        console.error("Failed to load FFmpeg:", error);
+        ui.processStatus.textContent = "FFmpeg Load Failed";
+        ui.processDetail.textContent = "Check browser console. (Is COOP/COEP configured?)";
+        throw error;
+    }
 }
 
 let finalZipBlob = null;
