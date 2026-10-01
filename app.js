@@ -611,10 +611,13 @@ async function loadFFmpeg() {
             if (ui.progressText) ui.progressText.textContent = `${pct}%`;
         });
         
-        // Pass standard coreURL and wasmURL directly
+        const workerBlobURL = await toBlobURL('https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/worker.js', 'text/javascript');
+        
+        // Pass standard coreURL, wasmURL, and workerURL directly
         await ffmpeg.load({
             coreURL: coreBlobURL,
-            wasmURL: wasmBlobURL
+            wasmURL: wasmBlobURL,
+            workerURL: workerBlobURL
         });
         
         ui.processDetail.textContent = 'Initializing engine...';
