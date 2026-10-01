@@ -543,35 +543,6 @@ ui.btnConvert.addEventListener('click', async () => {
     }
 });
 
-async function fetchWithProgress(url, type, onProgress) {
-    console.log(`Starting fetch for ${url}`);
-    const res = await fetch(url, { mode: 'cors' });
-    if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${url}`);
-    
-    if (!res.body) {
-        const blob = await res.blob();
-        return URL.createObjectURL(blob);
-    }
-
-    const reader = res.body.getReader();
-    const contentLength = +res.headers.get('Content-Length') || 0;
-    let receivedLength = 0;
-    let chunks = [];
-    while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-        receivedLength += value.length;
-        if (onProgress) {
-            let percent = contentLength ? Math.min(99, Math.round((receivedLength / contentLength) * 100)) : Math.min(99, Math.round((receivedLength / (30 * 1024 * 1024)) * 100));
-            onProgress(percent);
-        }
-    }
-    if (onProgress) onProgress(100);
-    const blob = new Blob(chunks, { type });
-    return URL.createObjectURL(blob);
-}
-
 async function loadFFmpeg() {
     if (isFfmpegLoaded) return;
     ui.processStatus.textContent = 'Loading FFmpeg Engine...';
@@ -598,27 +569,12 @@ async function loadFFmpeg() {
         }
     });
 
-    const coreBase = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
-    const ffmpegBase = 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd';
-
-    console.log("Loading FFmpeg from CDN (unpkg)...");
+    console.log("Loading FFmpeg locally...");
     try {
-        const coreBlobURL = await fetchWithProgress(`${coreBase}/ffmpeg-core.js`, 'text/javascript');
-        
-        ui.processDetail.textContent = 'Downloading WASM binaries (0%)';
-        const wasmBlobURL = await fetchWithProgress(`${coreBase}/ffmpeg-core.wasm`, 'application/wasm', (pct) => {
-            ui.processDetail.textContent = `Downloading WASM binaries (${pct}%)`;
-            ui.progressBar.style.width = `${pct}%`;
-            if (ui.progressText) ui.progressText.textContent = `${pct}%`;
-        });
-        
-        const workerBlobURL = await fetchWithProgress(`${ffmpegBase}/814.ffmpeg.js`, 'text/javascript');
-        
-        // Pass standard coreURL, wasmURL, and classWorkerURL directly
         await ffmpeg.load({
-            coreURL: coreBlobURL,
-            wasmURL: wasmBlobURL,
-            classWorkerURL: workerBlobURL
+            coreURL: '/ffmpeg/ffmpeg-core.js',
+            wasmURL: '/ffmpeg/ffmpeg-core.wasm',
+            classWorkerURL: '/ffmpeg/814.ffmpeg.js'
         });
         
         console.log("FFmpeg fully loaded!");
