@@ -569,12 +569,14 @@ async function loadFFmpeg() {
         }
     });
 
-    const localBase = window.location.origin;
-    console.log("Loading FFmpeg...");
+    const coreBaseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
+    const ffmpegBaseURL = 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm';
+
+    console.log("Loading FFmpeg from CDN...");
     await ffmpeg.load({
-        coreURL: `${localBase}/vendor/ffmpeg-core.js`,
-        wasmURL: `${localBase}/vendor/ffmpeg-core.wasm`,
-        classWorkerURL: `${localBase}/vendor/worker.js`
+        coreURL: await toBlobURL(`${coreBaseURL}/ffmpeg-core.js`, 'text/javascript'),
+        wasmURL: await toBlobURL(`${coreBaseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+        classWorkerURL: await toBlobURL(`${ffmpegBaseURL}/worker.js`, 'text/javascript')
     });
     console.log("FFmpeg loaded!");
     isFfmpegLoaded = true;
