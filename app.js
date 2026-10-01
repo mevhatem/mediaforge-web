@@ -598,21 +598,21 @@ async function loadFFmpeg() {
         }
     });
 
-    const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
-    const ffmpegBaseURL = 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm';
+    const coreBase = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+    const ffmpegBase = 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd';
 
     console.log("Loading FFmpeg from CDN (unpkg)...");
     try {
-        const coreBlobURL = await fetchWithProgress(`${baseURL}/ffmpeg-core.js`, 'text/javascript');
+        const coreBlobURL = await fetchWithProgress(`${coreBase}/ffmpeg-core.js`, 'text/javascript');
         
         ui.processDetail.textContent = 'Downloading WASM binaries (0%)';
-        const wasmBlobURL = await fetchWithProgress(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm', (pct) => {
+        const wasmBlobURL = await fetchWithProgress(`${coreBase}/ffmpeg-core.wasm`, 'application/wasm', (pct) => {
             ui.processDetail.textContent = `Downloading WASM binaries (${pct}%)`;
             ui.progressBar.style.width = `${pct}%`;
             if (ui.progressText) ui.progressText.textContent = `${pct}%`;
         });
         
-        const workerBlobURL = await fetchWithProgress(`${ffmpegBaseURL}/worker.js`, 'text/javascript');
+        const workerBlobURL = await fetchWithProgress(`${ffmpegBase}/814.ffmpeg.js`, 'text/javascript');
         
         // Pass standard coreURL, wasmURL, and classWorkerURL directly
         await ffmpeg.load({
@@ -621,8 +621,8 @@ async function loadFFmpeg() {
             classWorkerURL: workerBlobURL
         });
         
+        console.log("FFmpeg fully loaded!");
         ui.processDetail.textContent = 'Initializing engine...';
-        console.log("FFmpeg loaded successfully!");
         isFfmpegLoaded = true;
     } catch (error) {
         console.error("Failed to load FFmpeg:", error);
