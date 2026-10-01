@@ -614,11 +614,11 @@ async function loadFFmpeg() {
         
         const workerBlobURL = await fetchWithProgress(`${ffmpegBaseURL}/worker.js`, 'text/javascript');
         
-        // Pass standard coreURL, wasmURL, and workerURL directly
+        // Pass standard coreURL, wasmURL, and classWorkerURL directly
         await ffmpeg.load({
             coreURL: coreBlobURL,
             wasmURL: wasmBlobURL,
-            workerURL: workerBlobURL
+            classWorkerURL: workerBlobURL
         });
         
         ui.processDetail.textContent = 'Initializing engine...';
