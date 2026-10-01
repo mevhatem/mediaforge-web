@@ -816,6 +816,15 @@ async function processFiles() {
     ui.processStatus.textContent = 'Conversion Complete!';
     ui.processDetail.textContent = 'Ready for download';
     
+    // Google Analytics Custom Conversion Event
+    if (typeof window.gtag === 'function') {
+        window.gtag('event', 'file_conversion_completed', {
+            event_category: category,
+            target_format: targetFormat,
+            file_count: totalFilesCount
+        });
+    }
+
     ui.resultActions.classList.remove('hidden');
     ui.btnDownload.classList.remove('hidden');
 
