@@ -188,9 +188,9 @@ function setupConfiguration() {
         div.id = `file-item-${i}`;
         let actionButtonHTML = '';
         if (category === 'video' || category === 'audio') {
-            actionButtonHTML = `<button class="btn-trim-file" data-index="${i}">✂️ Trim</button>`;
+            actionButtonHTML = `<button class="btn-trim-file" data-index="${i}">✂️ Kırp</button>`;
         } else if (category === 'image') {
-            actionButtonHTML = `<button class="btn-resize-file" data-index="${i}">📐 Resize</button>`;
+            actionButtonHTML = `<button class="btn-resize-file" data-index="${i}">📐 Boyutlandır</button>`;
         }
         
         div.innerHTML = `
@@ -225,21 +225,32 @@ function setupConfiguration() {
                 </div>
             </div>
             
-            <div class="file-resize-section hidden" id="resize-section-${i}" style="background: rgba(0,0,0,0.2); padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                    <span style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase;">Resize Dimensions</span>
-                    <label style="font-size: 0.75rem; color: #a78bfa; display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
-                        <input type="checkbox" id="resize-lock-${i}" checked> Lock Aspect Ratio
+            <div class="file-resize-section hidden" id="resize-section-${i}">
+                <div class="resize-header">
+                    <div class="resize-title-group">
+                        <span class="resize-title">Yeniden Boyutlandır</span>
+                        <span class="resize-orig-badge" id="resize-orig-${i}">Orijinal Boyut</span>
+                    </div>
+                    <label class="resize-lock-label">
+                        <input type="checkbox" id="resize-lock-${i}" checked> En/Boy Oranını Koru
                     </label>
                 </div>
-                <div style="display: flex; gap: 1rem;">
-                    <div style="flex: 1;">
-                        <label style="font-size: 0.7rem; color: #9ca3af; display: block; margin-bottom: 0.25rem;">Width (px)</label>
-                        <input type="number" id="resize-w-${i}" class="text-input" placeholder="Auto" data-index="${i}">
+                <div class="resize-presets">
+                    <span class="presets-label">Hızlı Oran:</span>
+                    <button type="button" class="btn-preset" data-index="${i}" data-scale="0.25">%25</button>
+                    <button type="button" class="btn-preset" data-index="${i}" data-scale="0.50">%50</button>
+                    <button type="button" class="btn-preset" data-index="${i}" data-scale="0.75">%75</button>
+                    <button type="button" class="btn-preset" data-index="${i}" data-width="1920">1080p</button>
+                    <button type="button" class="btn-preset" data-index="${i}" data-scale="1.0">Orijinal</button>
+                </div>
+                <div class="resize-inputs-row">
+                    <div class="resize-input-group">
+                        <label>Genişlik (px)</label>
+                        <input type="number" id="resize-w-${i}" class="text-input" placeholder="Genişlik" data-index="${i}" min="1">
                     </div>
-                    <div style="flex: 1;">
-                        <label style="font-size: 0.7rem; color: #9ca3af; display: block; margin-bottom: 0.25rem;">Height (px)</label>
-                        <input type="number" id="resize-h-${i}" class="text-input" placeholder="Auto" data-index="${i}">
+                    <div class="resize-input-group">
+                        <label>Yükseklik (px)</label>
+                        <input type="number" id="resize-h-${i}" class="text-input" placeholder="Yükseklik" data-index="${i}" min="1">
                     </div>
                 </div>
             </div>
@@ -395,12 +406,39 @@ function setupConfiguration() {
                         file.originalDimensions = { width: img.width, height: img.height };
                         const wInput = document.getElementById(`resize-w-${index}`);
                         const hInput = document.getElementById(`resize-h-${index}`);
-                        if (!wInput.value) wInput.placeholder = img.width;
-                        if (!hInput.value) hInput.placeholder = img.height;
+                        const origBadge = document.getElementById(`resize-orig-${index}`);
+                        if (origBadge) origBadge.textContent = `${img.width} × ${img.height} px`;
+                        if (!wInput.value) wInput.value = img.width;
+                        if (!hInput.value) hInput.value = img.height;
                         URL.revokeObjectURL(url);
                     };
                     img.src = url;
                 }
+            }
+        });
+    });
+
+    // Preset buttons (%25, %50, %75, 1080p, Orijinal)
+    document.querySelectorAll('.btn-preset').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const index = parseInt(e.target.dataset.index, 10);
+            const file = selectedFiles[index];
+            if (!file || !file.originalDimensions) return;
+            
+            const wInput = document.getElementById(`resize-w-${index}`);
+            const hInput = document.getElementById(`resize-h-${index}`);
+            const origW = file.originalDimensions.width;
+            const origH = file.originalDimensions.height;
+            const aspect = origH / origW;
+
+            if (e.target.dataset.scale) {
+                const scale = parseFloat(e.target.dataset.scale);
+                wInput.value = Math.round(origW * scale);
+                hInput.value = Math.round(origH * scale);
+            } else if (e.target.dataset.width) {
+                const targetW = parseInt(e.target.dataset.width, 10);
+                wInput.value = targetW;
+                hInput.value = Math.round(targetW * aspect);
             }
         });
     });
