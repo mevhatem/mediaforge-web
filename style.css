@@ -699,3 +699,37 @@ button { border: none; font-family: inherit; font-size: 1rem; cursor: pointer; }
     border-color: #a78bfa;
     box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.25);
 }
+
+/* FAQ Section */
+.faq-section {
+    margin-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 1.5rem;
+}
+.faq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+}
+.faq-item {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.1rem;
+    transition: all 0.25s ease;
+}
+.faq-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+.faq-item h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #f3f4f6;
+    margin-bottom: 0.4rem;
+}
+.faq-item p {
+    font-size: 0.775rem;
+    color: #9ca3af;
+    line-height: 1.45;
+}
