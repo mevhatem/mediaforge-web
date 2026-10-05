@@ -794,15 +794,15 @@ async function processFiles() {
                     if (tableMatch) {
                         tableHtml = tableMatch[0];
                     }
+                    // Sanitize arbitrary inline font sizes so giant cell banners don't blow up PDF pages
+                    tableHtml = tableHtml.replace(/font-size:\s*[^;"']+/gi, 'font-size: inherit');
+                    
                     const sheetTitle = workbook.SheetNames.length > 1 
                         ? `<h3 style="margin-top: 20px; margin-bottom: 10px; font-size: 13pt; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px;">Sheet: ${sheetName}</h3>` 
                         : '';
                     sheetsHtml.push(`${sheetTitle}<div class="excel-table-wrapper">${tableHtml}</div>`);
                 });
                 
-                if (maxCols > 6) {
-                    isLandscape = true;
-                }
                 htmlContent = sheetsHtml.length > 0 
                     ? sheetsHtml.join('<div style="margin: 28px 0;"></div>') 
                     : '<p>Empty spreadsheet</p>';
@@ -816,13 +816,52 @@ async function processFiles() {
                 htmlContent = `<pre style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; white-space: pre-wrap; font-size: 10.5pt; line-height: 1.6;">${safeText}</pre>`;
             }
 
+            const isExcel = ['.xlsx', '.xls', '.csv'].includes(ext);
+            let paperOrientation = 'portrait';
+            let paperFormat = 'a4';
+            let baseFontSize = '10.5pt';
+            let cellPadding = '6px 8px';
+
+            if (isExcel) {
+                if (maxCols > 6) {
+                    paperOrientation = 'landscape';
+                }
+                if (maxCols > 20) {
+                    // Massive spreadsheet (e.g. 20-40 columns like inventory or municipal forms)
+                    paperFormat = 'a3';
+                    baseFontSize = '7pt';
+                    cellPadding = '3px 4px';
+                } else if (maxCols > 12) {
+                    paperFormat = 'a4';
+                    baseFontSize = '7.5pt';
+                    cellPadding = '4px 5px';
+                } else if (maxCols > 6) {
+                    paperFormat = 'a4';
+                    baseFontSize = '8.5pt';
+                    cellPadding = '5px 6px';
+                }
+            }
+
             const wrapper = document.createElement('div');
             wrapper.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
-            wrapper.style.fontSize = isLandscape ? "9.5pt" : "10.5pt";
-            wrapper.style.lineHeight = "1.5";
+            wrapper.style.fontSize = baseFontSize;
+            wrapper.style.lineHeight = "1.35";
             wrapper.style.color = "#1a1a1a";
-            wrapper.style.padding = "20px";
-            wrapper.style.maxWidth = isLandscape ? "1080px" : "750px";
+            wrapper.style.padding = isExcel ? "10px" : "20px";
+
+            if (isExcel) {
+                if (maxCols > 20) {
+                    wrapper.style.width = Math.max(1600, maxCols * 50) + "px";
+                } else if (maxCols > 6) {
+                    wrapper.style.width = "1100px";
+                } else {
+                    wrapper.style.width = "800px";
+                }
+                wrapper.style.maxWidth = "none";
+            } else {
+                wrapper.style.maxWidth = "750px";
+            }
+
             wrapper.innerHTML = `
                 <style>
                     h1 { font-size: 18pt; margin-top: 0; margin-bottom: 12px; color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
@@ -835,10 +874,12 @@ async function processFiles() {
                     pre { background: #f3f4f6; padding: 10px; border-radius: 6px; overflow-x: auto; }
                     hr { border: 0; border-top: 1px solid #e5e7eb; margin: 16px 0; }
                     strong { color: #111827; font-weight: 600; }
-                    table { border-collapse: collapse; width: 100%; margin-bottom: 16px; font-size: 9pt; }
-                    th, td { border: 1px solid #cbd5e1; padding: 6px 8px; text-align: left; vertical-align: top; word-break: break-word; }
+                    table { border-collapse: collapse; width: 100%; margin-bottom: 14px; table-layout: auto; }
+                    th, td { border: 1px solid #cbd5e1; padding: ${cellPadding}; text-align: left; vertical-align: middle; }
+                    .excel-table-wrapper * { font-size: inherit !important; line-height: 1.3 !important; }
                     tr:first-child td, tr:first-child th { background-color: #f1f5f9; font-weight: 600; color: #0f172a; border-bottom: 2px solid #94a3b8; }
                     tr:nth-child(even) { background-color: #f8fafc; }
+                    tr { page-break-inside: avoid; }
                 </style>
                 ${htmlContent}
             `;
@@ -846,11 +887,12 @@ async function processFiles() {
             document.body.appendChild(wrapper);
 
             const opt = {
-                margin: [10, 10, 10, 10],
+                margin: [8, 8, 8, 8],
                 filename: outputName,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: isLandscape ? 'landscape' : 'portrait' }
+                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                jsPDF: { unit: 'mm', format: paperFormat, orientation: paperOrientation },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
             blob = await window.html2pdf().set(opt).from(wrapper).output('blob');
