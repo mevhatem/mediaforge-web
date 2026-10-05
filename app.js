@@ -52,24 +52,28 @@ let totalFilesCount = 0;
 const formatOptions = {
     audio: ['mp3', 'wav', 'ogg', 'aac'],
     video: ['mp4', 'webm', 'avi', 'gif', 'mp3', 'wav', 'ogg', 'aac'],
-    image: ['jpg', 'png', 'webp']
+    image: ['jpg', 'png', 'webp', 'pdf'],
+    document: ['pdf']
 };
 
 const audioExtensions = ['.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac', '.wma', '.opus'];
 const videoExtensions = ['.mp4', '.mkv', '.avi', '.mov', '.webm', '.flv'];
 const imageExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tiff', '.gif'];
+const documentExtensions = ['.txt', '.docx', '.md'];
 
 function getCategory(file) {
     const type = file.type;
     if (type.startsWith('audio/')) return 'audio';
     if (type.startsWith('video/')) return 'video';
     if (type.startsWith('image/')) return 'image';
+    if (type === 'text/plain' || type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') return 'document';
     
     // Fallback to extension check
     const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
     if (audioExtensions.includes(ext)) return 'audio';
     if (videoExtensions.includes(ext)) return 'video';
     if (imageExtensions.includes(ext)) return 'image';
+    if (documentExtensions.includes(ext)) return 'document';
     
     return 'unknown';
 }
@@ -570,7 +574,9 @@ ui.btnConvert.addEventListener('click', async () => {
         ui.progressBar.style.width = '0%';
         if (ui.progressText) ui.progressText.textContent = '0%';
         
-        await loadFFmpeg();
+        if (category === 'video' || category === 'audio') {
+            await loadFFmpeg();
+        }
         await processFiles();
     } catch (error) {
         console.error("CRITICAL ERROR:", error);
@@ -663,6 +669,7 @@ async function processFiles() {
         else if (targetFormat === 'jpg') mime = 'image/jpeg';
         else if (targetFormat === 'png') mime = 'image/png';
         else if (targetFormat === 'webp') mime = 'image/webp';
+        else if (targetFormat === 'pdf') mime = 'application/pdf';
 
         const originalNameBase = file.name.substring(0, file.name.lastIndexOf('.'));
         const outputName = `${originalNameBase}.${targetFormat}`;
@@ -670,39 +677,136 @@ async function processFiles() {
         let blob = null;
 
         if (category === 'image') {
-            // Process Image natively via Canvas
-            blob = await new Promise((resolve, reject) => {
-                const img = new Image();
-                const url = URL.createObjectURL(file);
-                img.onload = () => {
-                    let targetWidth = img.naturalWidth;
-                    let targetHeight = img.naturalHeight;
-                    
-                    const wInput = document.getElementById(`resize-w-${i}`);
-                    const hInput = document.getElementById(`resize-h-${i}`);
-                    
-                    if (wInput && wInput.value) targetWidth = parseInt(wInput.value, 10);
-                    if (hInput && hInput.value) targetHeight = parseInt(hInput.value, 10);
-                    
-                    const canvas = document.createElement('canvas');
-                    canvas.width = targetWidth;
-                    canvas.height = targetHeight;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
-                    URL.revokeObjectURL(url);
-                    
-                    const quality = (targetFormat === 'jpg' || targetFormat === 'webp') ? parseFloat(ui.imageQuality.value) : undefined;
-                    canvas.toBlob((b) => {
-                        if (b) resolve(b);
-                        else reject(new Error("Canvas toBlob failed"));
-                    }, mime, quality);
-                };
-                img.onerror = () => {
-                    URL.revokeObjectURL(url);
-                    reject(new Error("Failed to load image"));
-                };
-                img.src = url;
-            });
+            if (targetFormat === 'pdf') {
+                // Image to PDF via jsPDF
+                blob = await new Promise((resolve, reject) => {
+                    const img = new Image();
+                    const url = URL.createObjectURL(file);
+                    img.onload = () => {
+                        try {
+                            const { jsPDF } = window.jspdf;
+                            const isLandscape = img.naturalWidth > img.naturalHeight;
+                            const pdf = new jsPDF({
+                                orientation: isLandscape ? 'landscape' : 'portrait',
+                                unit: 'px',
+                                format: [img.naturalWidth, img.naturalHeight]
+                            });
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.naturalWidth;
+                            canvas.height = img.naturalHeight;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+                            const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                            pdf.addImage(imgData, 'JPEG', 0, 0, img.naturalWidth, img.naturalHeight);
+                            URL.revokeObjectURL(url);
+                            const pdfBlob = pdf.output('blob');
+                            resolve(pdfBlob);
+                        } catch (err) {
+                            URL.revokeObjectURL(url);
+                            reject(err);
+                        }
+                    };
+                    img.onerror = () => {
+                        URL.revokeObjectURL(url);
+                        reject(new Error("Failed to load image for PDF conversion"));
+                    };
+                    img.src = url;
+                });
+            } else {
+                // Process Image natively via Canvas
+                blob = await new Promise((resolve, reject) => {
+                    const img = new Image();
+                    const url = URL.createObjectURL(file);
+                    img.onload = () => {
+                        let targetWidth = img.naturalWidth;
+                        let targetHeight = img.naturalHeight;
+                        
+                        const wInput = document.getElementById(`resize-w-${i}`);
+                        const hInput = document.getElementById(`resize-h-${i}`);
+                        
+                        if (wInput && wInput.value) targetWidth = parseInt(wInput.value, 10);
+                        if (hInput && hInput.value) targetHeight = parseInt(hInput.value, 10);
+                        
+                        const canvas = document.createElement('canvas');
+                        canvas.width = targetWidth;
+                        canvas.height = targetHeight;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+                        URL.revokeObjectURL(url);
+                        
+                        const quality = (targetFormat === 'jpg' || targetFormat === 'webp') ? parseFloat(ui.imageQuality.value) : undefined;
+                        canvas.toBlob((b) => {
+                            if (b) resolve(b);
+                            else reject(new Error("Canvas toBlob failed"));
+                        }, mime, quality);
+                    };
+                    img.onerror = () => {
+                        URL.revokeObjectURL(url);
+                        reject(new Error("Failed to load image"));
+                    };
+                    img.src = url;
+                });
+            }
+            const pct = Math.round(((currentFileIndex + 1) / totalFilesCount) * 100);
+            ui.progressBar.style.width = `${pct}%`;
+            if (ui.progressText) ui.progressText.textContent = `${pct}%`;
+        } else if (category === 'document') {
+            const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+            if (ext === '.docx') {
+                const arrayBuffer = await file.arrayBuffer();
+                const result = await window.mammoth.extractRawText({ arrayBuffer });
+                const text = result.value || 'Empty document';
+                
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
+                pdf.setFont('Helvetica', 'normal');
+                pdf.setFontSize(11);
+                
+                const margin = 40;
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const maxLineWidth = pageWidth - (margin * 2);
+                
+                const lines = pdf.splitTextToSize(text, maxLineWidth);
+                let cursorY = margin + 15;
+                const lineHeight = 16;
+                
+                for (let j = 0; j < lines.length; j++) {
+                    if (cursorY + lineHeight > pageHeight - margin) {
+                        pdf.addPage();
+                        cursorY = margin + 15;
+                    }
+                    pdf.text(lines[j], margin, cursorY);
+                    cursorY += lineHeight;
+                }
+                blob = pdf.output('blob');
+            } else {
+                // .txt or .md
+                const text = await file.text();
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
+                pdf.setFont('Helvetica', 'normal');
+                pdf.setFontSize(10);
+                
+                const margin = 40;
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const maxLineWidth = pageWidth - (margin * 2);
+                
+                const lines = pdf.splitTextToSize(text, maxLineWidth);
+                let cursorY = margin + 10;
+                const lineHeight = 14;
+                
+                for (let j = 0; j < lines.length; j++) {
+                    if (cursorY + lineHeight > pageHeight - margin) {
+                        pdf.addPage();
+                        cursorY = margin + 10;
+                    }
+                    pdf.text(lines[j], margin, cursorY);
+                    cursorY += lineHeight;
+                }
+                blob = pdf.output('blob');
+            }
             const pct = Math.round(((currentFileIndex + 1) / totalFilesCount) * 100);
             ui.progressBar.style.width = `${pct}%`;
             if (ui.progressText) ui.progressText.textContent = `${pct}%`;
