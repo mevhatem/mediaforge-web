@@ -733,3 +733,52 @@ button { border: none; font-family: inherit; font-size: 1rem; cursor: pointer; }
     color: #9ca3af;
     line-height: 1.45;
 }
+
+/* Popular Conversions (SEO Hub) */
+.popular-conversions-section {
+    margin-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 1.5rem;
+}
+.conversions-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+}
+.conversion-category-block {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.1rem;
+    transition: all 0.25s ease;
+}
+.conversion-category-block:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(139, 92, 246, 0.25);
+}
+.category-heading {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #f3f4f6;
+    margin-bottom: 0.75rem;
+}
+.conversion-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+.conversion-tag {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    cursor: default;
+}
+.conversion-tag:hover {
+    color: #f3f4f6;
+    background: rgba(139, 92, 246, 0.15);
+    border-color: rgba(139, 92, 246, 0.35);
+}
