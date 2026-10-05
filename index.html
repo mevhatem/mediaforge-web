@@ -18,7 +18,7 @@
     <title>MediaForge - 100% Private Online Media Converter (Video, Audio & Images)</title>
     <meta name="title" content="MediaForge - 100% Private Online Media Converter">
     <meta name="description" content="Free, fast, and 100% private in-browser media converter for video, audio, and images. Zero server uploads — all files are converted locally on your device with WebAssembly.">
-    <meta name="keywords" content="media converter, video to mp3, mp4 to mp3, webm converter, video trim online, audio converter, image converter, jpg to pdf, png to pdf, word to pdf, docx to pdf, private file converter, safe converter, wasm converter">
+    <meta name="keywords" content="media converter, video to mp3, mp4 to mp3, webm converter, video trim online, audio converter, image converter, jpg to pdf, png to pdf, word to pdf, docx to pdf, excel to pdf, xlsx to pdf, csv to pdf, private file converter, safe converter, wasm converter">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://www.mediaforgeconvert.com/">
 
@@ -30,14 +30,14 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.mediaforgeconvert.com/">
     <meta property="og:title" content="MediaForge - 100% Private Online Media Converter">
-    <meta property="og:description" content="Convert videos, audio, and images directly in your browser. Files never leave your device. Fast, free, and unlimited.">
+    <meta property="og:description" content="Convert videos, audio, images, documents, and spreadsheets directly in your browser. Files never leave your device. Fast, free, and unlimited.">
     <meta property="og:site_name" content="MediaForge">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://www.mediaforgeconvert.com/">
     <meta property="twitter:title" content="MediaForge - 100% Private Online Media Converter">
-    <meta property="twitter:description" content="Convert videos, audio, and images directly in your browser. Files never leave your device. Fast, free, and unlimited.">
+    <meta property="twitter:description" content="Convert videos, audio, images, documents, and spreadsheets directly in your browser. Files never leave your device. Fast, free, and unlimited.">
 
     <link rel="stylesheet" href="./style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" crossorigin="anonymous"></script>
@@ -45,6 +45,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -59,7 +60,7 @@
         <!-- State 1: Dropzone -->
         <div id="state-dropzone" class="state-panel active">
             <div id="drop-area" class="dropzone">
-                <input type="file" id="file-input" multiple class="hidden" accept="audio/*,video/*,image/*,.txt,.docx,.md,text/plain">
+                <input type="file" id="file-input" multiple class="hidden" accept="audio/*,video/*,image/*,.txt,.docx,.md,.xlsx,.xls,.csv,text/plain,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
                 <div class="icon-container">
                     <svg class="drop-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
@@ -92,9 +93,9 @@
                         <div class="feature-desc">Convert between JPG, PNG, and modern WebP. Resize dimensions and adjust quality with instant presets.</div>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon-wrapper">📄</div>
-                        <div class="feature-title">Document & Images to PDF</div>
-                        <div class="feature-desc">Convert Word (DOCX), Text (TXT, MD), and photos (JPG, PNG, WebP) directly into clean PDF documents.</div>
+                        <div class="feature-icon-wrapper">📊</div>
+                        <div class="feature-title">Office & Sheets to PDF</div>
+                        <div class="feature-desc">Convert Word (DOCX), Excel (XLSX, XLS, CSV), Markdown (MD), and Text into clean PDF documents.</div>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon-wrapper">🔒</div>

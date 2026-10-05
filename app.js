@@ -59,14 +59,20 @@ const formatOptions = {
 const audioExtensions = ['.mp3', '.wav', '.ogg', '.m4a', '.flac', '.aac', '.wma', '.opus'];
 const videoExtensions = ['.mp4', '.mkv', '.avi', '.mov', '.webm', '.flv'];
 const imageExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tiff', '.gif'];
-const documentExtensions = ['.txt', '.docx', '.md'];
+const documentExtensions = ['.txt', '.docx', '.md', '.xlsx', '.xls', '.csv'];
 
 function getCategory(file) {
     const type = file.type;
     if (type.startsWith('audio/')) return 'audio';
     if (type.startsWith('video/')) return 'video';
     if (type.startsWith('image/')) return 'image';
-    if (type === 'text/plain' || type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') return 'document';
+    if (
+        type === 'text/plain' || 
+        type === 'text/csv' ||
+        type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+        type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+        type === 'application/vnd.ms-excel'
+    ) return 'document';
     
     // Fallback to extension check
     const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
@@ -753,6 +759,7 @@ async function processFiles() {
         } else if (category === 'document') {
             const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
             let htmlContent = '';
+            let isLandscape = false;
             
             if (ext === '.docx') {
                 const arrayBuffer = await file.arrayBuffer();
@@ -761,6 +768,33 @@ async function processFiles() {
             } else if (ext === '.md') {
                 const rawText = await file.text();
                 htmlContent = window.marked ? window.marked.parse(rawText) : `<pre>${rawText}</pre>`;
+            } else if (['.xlsx', '.xls', '.csv'].includes(ext)) {
+                const arrayBuffer = await file.arrayBuffer();
+                const workbook = window.XLSX.read(arrayBuffer, { type: 'array' });
+                const sheetsHtml = [];
+                let maxCols = 0;
+                
+                workbook.SheetNames.forEach(sheetName => {
+                    const sheet = workbook.Sheets[sheetName];
+                    if (!sheet) return;
+                    if (sheet['!ref']) {
+                        const range = window.XLSX.utils.decode_range(sheet['!ref']);
+                        const cols = range.e.c - range.s.c + 1;
+                        if (cols > maxCols) maxCols = cols;
+                    }
+                    const tableHtml = window.XLSX.utils.sheet_to_html(sheet);
+                    const sheetTitle = workbook.SheetNames.length > 1 
+                        ? `<h3 style="margin-top: 20px; margin-bottom: 10px; font-size: 13pt; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px;">Sheet: ${sheetName}</h3>` 
+                        : '';
+                    sheetsHtml.push(`${sheetTitle}<div class="excel-table-wrapper">${tableHtml}</div>`);
+                });
+                
+                if (maxCols > 6) {
+                    isLandscape = true;
+                }
+                htmlContent = sheetsHtml.length > 0 
+                    ? sheetsHtml.join('<div style="margin: 28px 0;"></div>') 
+                    : '<p>Empty spreadsheet</p>';
             } else {
                 // .txt
                 const rawText = await file.text();
@@ -768,20 +802,20 @@ async function processFiles() {
                     .replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;');
-                htmlContent = `<pre style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; white-space: pre-wrap; font-size: 11pt; line-height: 1.6;">${safeText}</pre>`;
+                htmlContent = `<pre style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; white-space: pre-wrap; font-size: 10.5pt; line-height: 1.6;">${safeText}</pre>`;
             }
 
             const wrapper = document.createElement('div');
             wrapper.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
-            wrapper.style.fontSize = "11pt";
-            wrapper.style.lineHeight = "1.6";
+            wrapper.style.fontSize = isLandscape ? "9.5pt" : "10.5pt";
+            wrapper.style.lineHeight = "1.5";
             wrapper.style.color = "#1a1a1a";
             wrapper.style.padding = "20px";
-            wrapper.style.maxWidth = "750px";
+            wrapper.style.maxWidth = isLandscape ? "1080px" : "750px";
             wrapper.innerHTML = `
                 <style>
-                    h1 { font-size: 20pt; margin-top: 0; margin-bottom: 12px; color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
-                    h2 { font-size: 15pt; margin-top: 18px; margin-bottom: 8px; color: #1f2937; }
+                    h1 { font-size: 18pt; margin-top: 0; margin-bottom: 12px; color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
+                    h2 { font-size: 14pt; margin-top: 16px; margin-bottom: 8px; color: #1f2937; }
                     h3 { font-size: 12pt; margin-top: 14px; margin-bottom: 6px; color: #374151; }
                     p { margin-bottom: 10px; }
                     ul, ol { margin-left: 20px; margin-bottom: 12px; }
@@ -790,6 +824,10 @@ async function processFiles() {
                     pre { background: #f3f4f6; padding: 10px; border-radius: 6px; overflow-x: auto; }
                     hr { border: 0; border-top: 1px solid #e5e7eb; margin: 16px 0; }
                     strong { color: #111827; font-weight: 600; }
+                    table { border-collapse: collapse; width: 100%; margin-bottom: 16px; font-size: 9pt; }
+                    th, td { border: 1px solid #cbd5e1; padding: 6px 8px; text-align: left; vertical-align: top; word-break: break-word; }
+                    tr:first-child td, tr:first-child th { background-color: #f1f5f9; font-weight: 600; color: #0f172a; border-bottom: 2px solid #94a3b8; }
+                    tr:nth-child(even) { background-color: #f8fafc; }
                 </style>
                 ${htmlContent}
             `;
@@ -797,11 +835,11 @@ async function processFiles() {
             document.body.appendChild(wrapper);
 
             const opt = {
-                margin: [15, 15, 15, 15],
+                margin: [10, 10, 10, 10],
                 filename: outputName,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                jsPDF: { unit: 'mm', format: 'a4', orientation: isLandscape ? 'landscape' : 'portrait' }
             };
 
             blob = await window.html2pdf().set(opt).from(wrapper).output('blob');
