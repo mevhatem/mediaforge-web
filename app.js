@@ -188,9 +188,9 @@ function setupConfiguration() {
         div.id = `file-item-${i}`;
         let actionButtonHTML = '';
         if (category === 'video' || category === 'audio') {
-            actionButtonHTML = `<button class="btn-trim-file" data-index="${i}">✂️ Kırp</button>`;
+            actionButtonHTML = `<button class="btn-trim-file" data-index="${i}">✂️ Trim</button>`;
         } else if (category === 'image') {
-            actionButtonHTML = `<button class="btn-resize-file" data-index="${i}">📐 Boyutlandır</button>`;
+            actionButtonHTML = `<button class="btn-resize-file" data-index="${i}">📐 Resize</button>`;
         }
         
         div.innerHTML = `
@@ -228,29 +228,29 @@ function setupConfiguration() {
             <div class="file-resize-section hidden" id="resize-section-${i}">
                 <div class="resize-header">
                     <div class="resize-title-group">
-                        <span class="resize-title">Yeniden Boyutlandır</span>
-                        <span class="resize-orig-badge" id="resize-orig-${i}">Orijinal Boyut</span>
+                        <span class="resize-title">Resize Dimensions</span>
+                        <span class="resize-orig-badge" id="resize-orig-${i}">Original Size</span>
                     </div>
                     <label class="resize-lock-label">
-                        <input type="checkbox" id="resize-lock-${i}" checked> En/Boy Oranını Koru
+                        <input type="checkbox" id="resize-lock-${i}" checked> Lock Aspect Ratio
                     </label>
                 </div>
                 <div class="resize-presets">
-                    <span class="presets-label">Hızlı Oran:</span>
-                    <button type="button" class="btn-preset" data-index="${i}" data-scale="0.25">%25</button>
-                    <button type="button" class="btn-preset" data-index="${i}" data-scale="0.50">%50</button>
-                    <button type="button" class="btn-preset" data-index="${i}" data-scale="0.75">%75</button>
+                    <span class="presets-label">Presets:</span>
+                    <button type="button" class="btn-preset" data-index="${i}" data-scale="0.25">25%</button>
+                    <button type="button" class="btn-preset" data-index="${i}" data-scale="0.50">50%</button>
+                    <button type="button" class="btn-preset" data-index="${i}" data-scale="0.75">75%</button>
                     <button type="button" class="btn-preset" data-index="${i}" data-width="1920">1080p</button>
-                    <button type="button" class="btn-preset" data-index="${i}" data-scale="1.0">Orijinal</button>
+                    <button type="button" class="btn-preset" data-index="${i}" data-scale="1.0">Original</button>
                 </div>
                 <div class="resize-inputs-row">
                     <div class="resize-input-group">
-                        <label>Genişlik (px)</label>
-                        <input type="number" id="resize-w-${i}" class="text-input" placeholder="Genişlik" data-index="${i}" min="1">
+                        <label>Width (px)</label>
+                        <input type="number" id="resize-w-${i}" class="text-input" placeholder="Width" data-index="${i}" min="1">
                     </div>
                     <div class="resize-input-group">
-                        <label>Yükseklik (px)</label>
-                        <input type="number" id="resize-h-${i}" class="text-input" placeholder="Yükseklik" data-index="${i}" min="1">
+                        <label>Height (px)</label>
+                        <input type="number" id="resize-h-${i}" class="text-input" placeholder="Height" data-index="${i}" min="1">
                     </div>
                 </div>
             </div>
