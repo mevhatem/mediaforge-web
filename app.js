@@ -759,7 +759,7 @@ async function processFiles() {
         } else if (category === 'document') {
             const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
             let htmlContent = '';
-            let isLandscape = false;
+            let maxCols = 0;
             
             if (ext === '.docx') {
                 const arrayBuffer = await file.arrayBuffer();
@@ -779,7 +779,6 @@ async function processFiles() {
                     workbook = window.XLSX.read(arrayBuffer, { type: 'array', codepage: 65001 });
                 }
                 const sheetsHtml = [];
-                let maxCols = 0;
                 
                 workbook.SheetNames.forEach(sheetName => {
                     const sheet = workbook.Sheets[sheetName];
