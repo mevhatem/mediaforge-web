@@ -646,6 +646,8 @@ let singleFileName = "";
 
 async function processFiles() {
     totalFilesCount = selectedFiles.length;
+    const processStartTime = Date.now();
+    ui.progressBar.classList.remove('completed');
     const zip = new JSZip();
 
     for (let i = 0; i < totalFilesCount; i++) {
@@ -661,6 +663,15 @@ async function processFiles() {
         const baseProgress = Math.round((i / totalFilesCount) * 100);
         ui.progressBar.style.width = `${baseProgress}%`;
         if (ui.progressText) ui.progressText.textContent = `${baseProgress}%`;
+
+        // For instantaneous client-side conversions (images/documents), kickstart progress visibly
+        if (category === 'image' || category === 'document') {
+            const initialJump = Math.min(90, baseProgress + Math.round(45 / totalFilesCount));
+            setTimeout(() => {
+                ui.progressBar.style.width = `${initialJump}%`;
+                if (ui.progressText) ui.progressText.textContent = `${initialJump}%`;
+            }, 120);
+        }
 
         // Determine MIME type
         let mime = 'application/octet-stream';
@@ -1012,7 +1023,15 @@ async function processFiles() {
     
     ui.progressBar.style.width = '100%';
     if (ui.progressText) ui.progressText.textContent = '100%';
-    ui.processStatus.textContent = 'Conversion Complete!';
+    ui.progressBar.classList.add('completed');
+    
+    // Ensure smooth micro-satisfaction delay (minimum ~1.2s total so user perceives the work)
+    const elapsed = Date.now() - processStartTime;
+    if (elapsed < 1200) {
+        await new Promise(resolve => setTimeout(resolve, 1200 - elapsed));
+    }
+
+    ui.processStatus.textContent = '✨ Conversion Complete!';
     ui.processDetail.textContent = 'Ready for download';
     
     // Google Analytics Custom Conversion Event
@@ -1058,6 +1077,7 @@ ui.btnRestart.addEventListener('click', () => {
     finalZipBlob = null;
     singleBlob = null;
     ui.fileInput.value = '';
+    ui.progressBar.classList.remove('completed');
     ui.progressBar.style.width = '0%';
     if (ui.progressText) ui.progressText.textContent = '0%';
     if (ui.downloadFilename) ui.downloadFilename.classList.add('hidden');
