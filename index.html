@@ -22,9 +22,18 @@
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://www.mediaforgeconvert.com/">
 
-    <!-- Favicon -->
+    <!-- Favicon & PWA Icons -->
     <link rel="icon" type="image/svg+xml" href="./favicon.svg">
     <link rel="alternate icon" href="./favicon.svg">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+
+    <!-- PWA & Mobile Web App Meta Tags -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0b0f19">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Media Forge">
 
     <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website">
@@ -84,7 +93,12 @@
         
         <!-- Header -->
         <header class="header">
-            <h1 class="title">Media Forge</h1>
+            <div class="header-title-row">
+                <h1 class="title">Media Forge</h1>
+                <button id="btn-pwa-install" class="btn-pwa-install hidden" title="Install App on your device">
+                    <span>📲</span> Install App
+                </button>
+            </div>
             <p class="subtitle">MediaForge — 100% Private In-Browser Media & File Converter</p>
         </header>
 

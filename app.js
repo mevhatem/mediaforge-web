@@ -1084,3 +1084,42 @@ ui.btnRestart.addEventListener('click', () => {
     
     switchState('state-dropzone');
 });
+
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => {
+            console.log('Service Worker registration skipped/failed:', err);
+        });
+    });
+}
+
+// PWA Install Prompt Logic
+let deferredPrompt = null;
+const btnPwaInstall = document.getElementById('btn-pwa-install');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (btnPwaInstall) {
+        btnPwaInstall.classList.remove('hidden');
+    }
+});
+
+if (btnPwaInstall) {
+    btnPwaInstall.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            btnPwaInstall.classList.add('hidden');
+        }
+        deferredPrompt = null;
+    });
+}
+
+window.addEventListener('appinstalled', () => {
+    if (btnPwaInstall) {
+        btnPwaInstall.classList.add('hidden');
+    }
+});
