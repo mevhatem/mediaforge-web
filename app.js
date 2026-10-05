@@ -769,8 +769,15 @@ async function processFiles() {
                 const rawText = await file.text();
                 htmlContent = window.marked ? window.marked.parse(rawText) : `<pre>${rawText}</pre>`;
             } else if (['.xlsx', '.xls', '.csv'].includes(ext)) {
-                const arrayBuffer = await file.arrayBuffer();
-                const workbook = window.XLSX.read(arrayBuffer, { type: 'array' });
+                let workbook;
+                if (ext === '.csv') {
+                    // Browser native UTF-8 text decoding for CSV
+                    const text = await file.text();
+                    workbook = window.XLSX.read(text, { type: 'string' });
+                } else {
+                    const arrayBuffer = await file.arrayBuffer();
+                    workbook = window.XLSX.read(arrayBuffer, { type: 'array', codepage: 65001 });
+                }
                 const sheetsHtml = [];
                 let maxCols = 0;
                 
@@ -782,7 +789,11 @@ async function processFiles() {
                         const cols = range.e.c - range.s.c + 1;
                         if (cols > maxCols) maxCols = cols;
                     }
-                    const tableHtml = window.XLSX.utils.sheet_to_html(sheet);
+                    let tableHtml = window.XLSX.utils.sheet_to_html(sheet);
+                    const tableMatch = tableHtml.match(/<table[\s\S]*<\/table>/i);
+                    if (tableMatch) {
+                        tableHtml = tableMatch[0];
+                    }
                     const sheetTitle = workbook.SheetNames.length > 1 
                         ? `<h3 style="margin-top: 20px; margin-bottom: 10px; font-size: 13pt; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px;">Sheet: ${sheetName}</h3>` 
                         : '';
