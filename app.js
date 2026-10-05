@@ -842,6 +842,12 @@ async function processFiles() {
             }
 
             const wrapper = document.createElement('div');
+            wrapper.style.position = 'fixed';
+            wrapper.style.left = '0';
+            wrapper.style.top = '0';
+            wrapper.style.zIndex = '-9999';
+            wrapper.style.pointerEvents = 'none';
+            wrapper.style.background = '#ffffff';
             wrapper.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
             wrapper.style.fontSize = baseFontSize;
             wrapper.style.lineHeight = "1.35";
@@ -889,7 +895,7 @@ async function processFiles() {
                 margin: [8, 8, 8, 8],
                 filename: outputName,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                html2canvas: { scale: 2, useCORS: true },
                 jsPDF: { unit: 'mm', format: paperFormat, orientation: paperOrientation },
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
