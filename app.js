@@ -752,61 +752,60 @@ async function processFiles() {
             if (ui.progressText) ui.progressText.textContent = `${pct}%`;
         } else if (category === 'document') {
             const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+            let htmlContent = '';
+            
             if (ext === '.docx') {
                 const arrayBuffer = await file.arrayBuffer();
-                const result = await window.mammoth.extractRawText({ arrayBuffer });
-                const text = result.value || 'Empty document';
-                
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
-                pdf.setFont('Helvetica', 'normal');
-                pdf.setFontSize(11);
-                
-                const margin = 40;
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-                const maxLineWidth = pageWidth - (margin * 2);
-                
-                const lines = pdf.splitTextToSize(text, maxLineWidth);
-                let cursorY = margin + 15;
-                const lineHeight = 16;
-                
-                for (let j = 0; j < lines.length; j++) {
-                    if (cursorY + lineHeight > pageHeight - margin) {
-                        pdf.addPage();
-                        cursorY = margin + 15;
-                    }
-                    pdf.text(lines[j], margin, cursorY);
-                    cursorY += lineHeight;
-                }
-                blob = pdf.output('blob');
+                const result = await window.mammoth.convertToHtml({ arrayBuffer });
+                htmlContent = result.value || '<p>Empty document</p>';
+            } else if (ext === '.md') {
+                const rawText = await file.text();
+                htmlContent = window.marked ? window.marked.parse(rawText) : `<pre>${rawText}</pre>`;
             } else {
-                // .txt or .md
-                const text = await file.text();
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
-                pdf.setFont('Helvetica', 'normal');
-                pdf.setFontSize(10);
-                
-                const margin = 40;
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-                const maxLineWidth = pageWidth - (margin * 2);
-                
-                const lines = pdf.splitTextToSize(text, maxLineWidth);
-                let cursorY = margin + 10;
-                const lineHeight = 14;
-                
-                for (let j = 0; j < lines.length; j++) {
-                    if (cursorY + lineHeight > pageHeight - margin) {
-                        pdf.addPage();
-                        cursorY = margin + 10;
-                    }
-                    pdf.text(lines[j], margin, cursorY);
-                    cursorY += lineHeight;
-                }
-                blob = pdf.output('blob');
+                // .txt
+                const rawText = await file.text();
+                const safeText = rawText
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+                htmlContent = `<pre style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; white-space: pre-wrap; font-size: 11pt; line-height: 1.6;">${safeText}</pre>`;
             }
+
+            const wrapper = document.createElement('div');
+            wrapper.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+            wrapper.style.fontSize = "11pt";
+            wrapper.style.lineHeight = "1.6";
+            wrapper.style.color = "#1a1a1a";
+            wrapper.style.padding = "20px";
+            wrapper.style.maxWidth = "750px";
+            wrapper.innerHTML = `
+                <style>
+                    h1 { font-size: 20pt; margin-top: 0; margin-bottom: 12px; color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
+                    h2 { font-size: 15pt; margin-top: 18px; margin-bottom: 8px; color: #1f2937; }
+                    h3 { font-size: 12pt; margin-top: 14px; margin-bottom: 6px; color: #374151; }
+                    p { margin-bottom: 10px; }
+                    ul, ol { margin-left: 20px; margin-bottom: 12px; }
+                    li { margin-bottom: 4px; }
+                    code { background: #f3f4f6; padding: 2px 4px; border-radius: 4px; font-family: monospace; font-size: 9.5pt; }
+                    pre { background: #f3f4f6; padding: 10px; border-radius: 6px; overflow-x: auto; }
+                    hr { border: 0; border-top: 1px solid #e5e7eb; margin: 16px 0; }
+                    strong { color: #111827; font-weight: 600; }
+                </style>
+                ${htmlContent}
+            `;
+            
+            document.body.appendChild(wrapper);
+
+            const opt = {
+                margin: [15, 15, 15, 15],
+                filename: outputName,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            blob = await window.html2pdf().set(opt).from(wrapper).output('blob');
+            document.body.removeChild(wrapper);
             const pct = Math.round(((currentFileIndex + 1) / totalFilesCount) * 100);
             ui.progressBar.style.width = `${pct}%`;
             if (ui.progressText) ui.progressText.textContent = `${pct}%`;
