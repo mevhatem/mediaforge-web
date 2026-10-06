@@ -809,3 +809,317 @@ button { border: none; font-family: inherit; font-size: 1rem; cursor: pointer; }
     background: rgba(139, 92, 246, 0.15);
     border-color: rgba(139, 92, 246, 0.35);
 }
+
+/* Suite Navigation (Pill Tabs) */
+.suite-nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.4rem;
+    margin-top: 1.25rem;
+    padding: 0.35rem 0.5rem;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+    overflow-x: auto;
+    max-width: 100%;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+@media (min-width: 768px) {
+    .suite-nav {
+        justify-content: center;
+    }
+}
+.suite-nav::-webkit-scrollbar {
+    display: none;
+}
+.nav-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #9ca3af;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+.nav-tab-btn:hover {
+    color: #e5e7eb;
+    background: rgba(255, 255, 255, 0.06);
+}
+.nav-tab-btn.active {
+    color: #ffffff;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+}
+.nav-tab-btn .nav-icon {
+    font-size: 0.95rem;
+}
+
+/* Tool Workspaces */
+.tool-workspace {
+    display: none;
+    animation: fadeIn 0.35s ease-out forwards;
+}
+.tool-workspace.active {
+    display: block;
+}
+.tool-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+.tool-header h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #f3f4f6;
+    margin-bottom: 0.35rem;
+}
+.tool-header p {
+    font-size: 0.85rem;
+    color: #9ca3af;
+}
+
+/* Tool Dropzone & List */
+.tool-dropzone {
+    padding: 2.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+}
+.tool-file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    max-height: 250px;
+    overflow-y: auto;
+}
+.tool-file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65rem 0.85rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    font-size: 0.85rem;
+}
+.tool-file-info {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 0;
+    flex: 1;
+}
+.tool-file-num {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #a78bfa;
+    width: 22px;
+}
+.tool-file-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #e5e7eb;
+}
+.tool-file-size {
+    font-size: 0.75rem;
+    color: #6b7280;
+    flex-shrink: 0;
+}
+.tool-file-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.btn-tool-action {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #d1d5db;
+    border-radius: 4px;
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-tool-action:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+.btn-tool-action:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Tool Controls */
+.tool-controls-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+.tool-controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+.control-group label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+}
+.tool-action-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+.tool-status {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #a78bfa;
+    margin: 1rem 0;
+    font-weight: 500;
+}
+.tool-result-actions {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Watermark & OCR Previews */
+.wm-preview-box {
+    margin-bottom: 1.25rem;
+    text-align: center;
+}
+.wm-preview-box label, .ocr-preview-box label {
+    display: block;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+}
+.wm-canvas {
+    max-width: 100%;
+    max-height: 280px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+.ocr-preview-box {
+    text-align: center;
+    margin-bottom: 1.25rem;
+}
+.ocr-preview-box img {
+    max-width: 100%;
+    max-height: 220px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.ocr-result-box {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.ocr-textarea {
+    width: 100%;
+    background: rgba(17, 24, 39, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: #f3f4f6;
+    padding: 0.85rem;
+    font-family: inherit;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+}
+.ocr-textarea:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
+}
+.ocr-btn-row {
+    display: flex;
+    gap: 0.75rem;
+}
+.btn-tool-outline {
+    flex: 1;
+    padding: 0.65rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-tool-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+/* Background Removal Comparison */
+.bg-compare-box {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+.bg-preview-card {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.3);
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.bg-preview-card img {
+    max-width: 100%;
+    max-height: 250px;
+    display: block;
+}
+.preview-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    color: #e5e7eb;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}
+.checkerboard-bg {
+    background-image: linear-gradient(45deg, #1f2937 25%, transparent 25%),
+                      linear-gradient(-45deg, #1f2937 25%, transparent 25%),
+                      linear-gradient(45deg, transparent 75%, #1f2937 75%),
+                      linear-gradient(-45deg, transparent 75%, #1f2937 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    background-color: #111827;
+}

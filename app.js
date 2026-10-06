@@ -1,5 +1,6 @@
 import { FFmpeg } from 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js';
 import { fetchFile, toBlobURL } from 'https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js';
+import { initSuiteRouter } from './tools-router.js';
 
 const ffmpeg = new FFmpeg();
 
@@ -1123,3 +1124,7 @@ window.addEventListener('appinstalled', () => {
         btnPwaInstall.classList.add('hidden');
     }
 });
+
+// Initialize MediaForge Suite Router
+initSuiteRouter();
+

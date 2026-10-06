@@ -100,10 +100,23 @@
                 </button>
             </div>
             <p class="subtitle">MediaForge — 100% Private In-Browser Media & File Converter</p>
+
+            <!-- MediaForge Suite Navigation Tabs -->
+            <nav class="suite-nav">
+                <button class="nav-tab-btn active" data-tool="converter"><span class="nav-icon">⚡</span> Converter</button>
+                <button class="nav-tab-btn" data-tool="pdf"><span class="nav-icon">📑</span> PDF Merge</button>
+                <button class="nav-tab-btn" data-tool="heic"><span class="nav-icon">🍏</span> HEIC to JPG</button>
+                <button class="nav-tab-btn" data-tool="exif"><span class="nav-icon">🛡️</span> Privacy Stripper</button>
+                <button class="nav-tab-btn" data-tool="watermark"><span class="nav-icon">💧</span> Watermark Studio</button>
+                <button class="nav-tab-btn" data-tool="ocr"><span class="nav-icon">🔍</span> OCR Scanner</button>
+                <button class="nav-tab-btn" data-tool="bgremover"><span class="nav-icon">✨</span> Background Remover</button>
+            </nav>
         </header>
 
-        <!-- State 1: Dropzone -->
-        <div id="state-dropzone" class="state-panel active">
+        <!-- Workspace 1: Media & Document Converter -->
+        <div id="workspace-converter" class="tool-workspace active">
+            <!-- State 1: Dropzone -->
+            <div id="state-dropzone" class="state-panel active">
             <div id="drop-area" class="dropzone">
                 <input type="file" id="file-input" multiple class="hidden" accept="audio/*,video/*,image/*,.txt,.docx,.md,.xlsx,.xls,.csv,text/plain,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
                 <div class="icon-container">
@@ -146,6 +159,36 @@
                         <div class="feature-icon-wrapper">🔒</div>
                         <div class="feature-title">100% Private & Unlimited</div>
                         <div class="feature-desc">Powered by WebAssembly — all processing runs locally on your device with no file size limits.</div>
+                    </div>
+                    <div class="feature-card" data-tool="pdf" style="cursor: pointer;">
+                        <div class="feature-icon-wrapper">📑</div>
+                        <div class="feature-title">PDF Merger & Organizer</div>
+                        <div class="feature-desc">Reorder and combine multiple PDF files into one clean document instantly. Click to launch tool.</div>
+                    </div>
+                    <div class="feature-card" data-tool="heic" style="cursor: pointer;">
+                        <div class="feature-icon-wrapper">🍏</div>
+                        <div class="feature-title">iPhone HEIC to JPG</div>
+                        <div class="feature-desc">Convert iOS HEIC/HEIF photos into high-res JPG or PNG images on your browser. Click to launch tool.</div>
+                    </div>
+                    <div class="feature-card" data-tool="exif" style="cursor: pointer;">
+                        <div class="feature-icon-wrapper">🛡️</div>
+                        <div class="feature-title">EXIF Privacy Stripper</div>
+                        <div class="feature-desc">Remove GPS coordinates, camera serials, timestamps, and metadata from images. Click to launch tool.</div>
+                    </div>
+                    <div class="feature-card" data-tool="watermark" style="cursor: pointer;">
+                        <div class="feature-icon-wrapper">💧</div>
+                        <div class="feature-title">Batch Watermark Studio</div>
+                        <div class="feature-desc">Stamp custom text watermarks across batches of images with live preview. Click to launch tool.</div>
+                    </div>
+                    <div class="feature-card" data-tool="ocr" style="cursor: pointer;">
+                        <div class="feature-icon-wrapper">🔍</div>
+                        <div class="feature-title">Image-to-Text OCR</div>
+                        <div class="feature-desc">Scan documents and images into editable text in Turkish, English, German, and more. Click to launch tool.</div>
+                    </div>
+                    <div class="feature-card" data-tool="bgremover" style="cursor: pointer;">
+                        <div class="feature-icon-wrapper">✨</div>
+                        <div class="feature-title">AI Background Remover</div>
+                        <div class="feature-desc">Cut out backgrounds with local in-browser machine learning and export transparent PNGs. Click to launch tool.</div>
                     </div>
                 </div>
             </div>
@@ -284,6 +327,268 @@
                 <div id="download-filename" class="hidden" style="text-align: center; color: #9ca3af; font-size: 0.85rem; margin-bottom: 0.5rem; word-break: break-all;"></div>
                 <button id="btn-download" class="btn-success">Download</button>
                 <button id="btn-restart" class="btn-secondary">Convert More Files</button>
+            </div>
+        </div>
+        </div> <!-- end workspace-converter -->
+
+        <!-- Workspace 2: PDF Tools (Merge & Split) -->
+        <div id="workspace-pdf" class="tool-workspace">
+            <div class="tool-header">
+                <h2>📑 In-Browser PDF Merger</h2>
+                <p>Combine multiple PDF documents into a single file locally with zero server uploads.</p>
+            </div>
+
+            <div id="pdf-drop-area" class="dropzone tool-dropzone">
+                <input type="file" id="pdf-file-input" multiple class="hidden" accept=".pdf,application/pdf">
+                <div class="icon-container">
+                    <svg class="drop-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                </div>
+                <h3>Drag & Drop PDF files here</h3>
+                <p>or click to browse multiple PDFs</p>
+            </div>
+
+            <div id="pdf-file-list" class="tool-file-list hidden"></div>
+
+            <div class="tool-action-bar">
+                <button id="btn-pdf-merge" class="btn-primary" disabled>Merge PDFs</button>
+                <div id="pdf-status" class="tool-status hidden"></div>
+                <div id="pdf-result" class="hidden" style="text-align: center; margin-top: 0.5rem;">
+                    <button id="btn-pdf-download" class="btn-success">Download Merged PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workspace 3: HEIC to JPG -->
+        <div id="workspace-heic" class="tool-workspace">
+            <div class="tool-header">
+                <h2>🍏 Apple HEIC / HEIF Converter</h2>
+                <p>Convert iPhone HEIC photos into universally compatible JPG or PNG images on your device.</p>
+            </div>
+
+            <div id="heic-drop-area" class="dropzone tool-dropzone">
+                <input type="file" id="heic-file-input" multiple class="hidden" accept=".heic,.heif">
+                <div class="icon-container">
+                    <svg class="drop-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <h3>Drag & Drop iPhone .HEIC files here</h3>
+                <p>or click to browse</p>
+            </div>
+
+            <div id="heic-file-list" class="tool-file-list hidden"></div>
+
+            <div class="tool-controls-grid">
+                <div class="control-group">
+                    <label for="heic-format">Output Format</label>
+                    <select id="heic-format" class="select-input">
+                        <option value="JPEG" selected>JPG (Standard)</option>
+                        <option value="PNG">PNG (Lossless)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="heic-quality">Output Quality</label>
+                    <select id="heic-quality" class="select-input">
+                        <option value="0.95" selected>95% (High Quality)</option>
+                        <option value="0.85">85% (Balanced)</option>
+                        <option value="0.7">70% (Smaller Size)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="tool-action-bar">
+                <button id="btn-heic-convert" class="btn-primary" disabled>Convert HEIC Images</button>
+                <div id="heic-status" class="tool-status hidden"></div>
+                <div id="heic-result" class="hidden" style="text-align: center; margin-top: 0.5rem;">
+                    <button id="btn-heic-download" class="btn-success">Download Converted Image(s)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workspace 4: EXIF Privacy Cleaner -->
+        <div id="workspace-exif" class="tool-workspace">
+            <div class="tool-header">
+                <h2>🛡️ EXIF & Privacy Metadata Stripper</h2>
+                <p>Safely strip GPS coordinates, camera serials, timestamps and device info before sharing.</p>
+            </div>
+
+            <div id="exif-drop-area" class="dropzone tool-dropzone">
+                <input type="file" id="exif-file-input" multiple class="hidden" accept="image/*">
+                <div class="icon-container">
+                    <svg class="drop-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                </div>
+                <h3>Drag & Drop photos here to strip metadata</h3>
+                <p>or click to browse</p>
+            </div>
+
+            <div id="exif-file-list" class="tool-file-list hidden"></div>
+
+            <div class="tool-action-bar">
+                <button id="btn-exif-clean" class="btn-primary" disabled>Clean & Strip Metadata</button>
+                <div id="exif-status" class="tool-status hidden"></div>
+                <div id="exif-result" class="hidden" style="text-align: center; margin-top: 0.5rem;">
+                    <button id="btn-exif-download" class="btn-success">Download Cleaned Image(s)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workspace 5: Watermark Studio -->
+        <div id="workspace-watermark" class="tool-workspace">
+            <div class="tool-header">
+                <h2>💧 Batch Watermark Studio</h2>
+                <p>Protect your brand. Add customizable text watermarks to your images in bulk locally.</p>
+            </div>
+
+            <div id="wm-drop-area" class="dropzone tool-dropzone">
+                <input type="file" id="wm-file-input" multiple class="hidden" accept="image/*">
+                <div class="icon-container">
+                    <svg class="drop-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                    </svg>
+                </div>
+                <h3>Drag & Drop photos to watermark</h3>
+                <p>or click to browse</p>
+            </div>
+
+            <div id="wm-file-list" class="tool-file-list hidden"></div>
+
+            <div id="wm-preview-container" class="wm-preview-box hidden">
+                <label style="font-size: 0.75rem; font-weight: 600; color: #9ca3af; text-transform: uppercase;">Live Preview</label>
+                <canvas id="wm-preview-canvas" style="max-width: 100%; height: auto; border-radius: 8px; margin-top: 0.5rem;"></canvas>
+            </div>
+
+            <div class="tool-controls-grid">
+                <div class="control-group">
+                    <label for="wm-text">Watermark Text</label>
+                    <input type="text" id="wm-text" class="select-input" value="© MediaForge" placeholder="Your watermark text">
+                </div>
+                <div class="control-group">
+                    <label for="wm-position">Position</label>
+                    <select id="wm-position" class="select-input">
+                        <option value="bottom-right" selected>Bottom Right</option>
+                        <option value="bottom-left">Bottom Left</option>
+                        <option value="center">Center</option>
+                        <option value="top-right">Top Right</option>
+                        <option value="top-left">Top Left</option>
+                        <option value="tile">Diagonal Repeat (Tile)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="wm-size">Font Size</label>
+                    <select id="wm-size" class="select-input">
+                        <option value="small">Small (3% of height)</option>
+                        <option value="medium" selected>Medium (5% of height)</option>
+                        <option value="large">Large (8% of height)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="wm-color">Color</label>
+                    <input type="color" id="wm-color" value="#ffffff" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; height: 38px; cursor: pointer; width: 100%;">
+                </div>
+                <div class="control-group">
+                    <label for="wm-opacity">Opacity: <span id="wm-opacity-val">50%</span></label>
+                    <input type="range" id="wm-opacity" min="0.1" max="1" step="0.05" value="0.5" style="accent-color: #6366f1; cursor: pointer;">
+                </div>
+            </div>
+
+            <div class="tool-action-bar">
+                <button id="btn-wm-apply" class="btn-primary" disabled>Apply Watermark & Export</button>
+                <div id="wm-status" class="tool-status hidden"></div>
+                <div id="wm-result" class="hidden" style="text-align: center; margin-top: 0.5rem;">
+                    <button id="btn-wm-download" class="btn-success">Download Watermarked Image(s)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workspace 6: OCR Scanner -->
+        <div id="workspace-ocr" class="tool-workspace">
+            <div class="tool-header">
+                <h2>🔍 In-Browser OCR Scanner</h2>
+                <p>Extract searchable, editable text from scanned images and documents without sending files anywhere.</p>
+            </div>
+
+            <div id="ocr-drop-area" class="dropzone tool-dropzone">
+                <input type="file" id="ocr-file-input" class="hidden" accept="image/*">
+                <div class="icon-container">
+                    <svg class="drop-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <h3>Drag & Drop scanned image or document</h3>
+                <p>or click to browse</p>
+            </div>
+
+            <div id="ocr-preview-container" class="hidden" style="text-align: center; margin-bottom: 1rem;">
+                <img id="ocr-preview-img" style="max-height: 220px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" alt="OCR Preview">
+            </div>
+
+            <div class="tool-controls-grid">
+                <div class="control-group">
+                    <label for="ocr-language">Document Language</label>
+                    <select id="ocr-language" class="select-input">
+                        <option value="tur+eng" selected>Turkish + English</option>
+                        <option value="eng">English</option>
+                        <option value="tur">Turkish</option>
+                        <option value="deu">German (Deutsch)</option>
+                        <option value="fra">French (Français)</option>
+                        <option value="spa">Spanish (Español)</option>
+                        <option value="ara">Arabic</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="tool-action-bar">
+                <button id="btn-ocr-scan" class="btn-primary" disabled>Extract Text from Image (OCR)</button>
+                <div id="ocr-status" class="tool-status hidden"></div>
+                <div id="ocr-result" class="hidden" style="margin-top: 1rem;">
+                    <textarea id="ocr-output" class="ocr-textarea" placeholder="Recognized text will appear here..."></textarea>
+                    <div style="display: flex; gap: 0.75rem; justify-content: center; margin-top: 0.75rem;">
+                        <button id="btn-ocr-copy" class="btn-secondary">📋 Copy Text</button>
+                        <button id="btn-ocr-download-txt" class="btn-success">💾 Download as .TXT</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workspace 7: Background Remover -->
+        <div id="workspace-bgremover" class="tool-workspace">
+            <div class="tool-header">
+                <h2>✨ AI Background Remover</h2>
+                <p>Automatic background removal running 100% inside your browser using machine learning.</p>
+            </div>
+
+            <div id="bg-drop-area" class="dropzone tool-dropzone">
+                <input type="file" id="bg-file-input" class="hidden" accept="image/*">
+                <div class="icon-container">
+                    <svg class="drop-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                </div>
+                <h3>Drag & Drop photo to remove background</h3>
+                <p>or click to browse</p>
+            </div>
+
+            <div id="bg-preview-container" class="hidden bg-compare-box" style="margin-bottom: 1.25rem;">
+                <div class="bg-preview-col" style="flex: 1; text-align: center;">
+                    <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 0.35rem; font-weight: 600;">ORIGINAL</div>
+                    <img id="bg-preview-orig" style="max-height: 220px; max-width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" alt="Original Image">
+                </div>
+                <div class="bg-preview-col" style="flex: 1; text-align: center;">
+                    <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 0.35rem; font-weight: 600;">TRANSPARENT RESULT</div>
+                    <img id="bg-preview-result" style="max-height: 220px; max-width: 100%; border-radius: 8px; background: repeating-conic-gradient(#374151 0% 25%, #1f2937 0% 50%) 50% / 16px 16px; border: 1px solid rgba(255,255,255,0.1);" alt="Background Removed Result">
+                </div>
+            </div>
+
+            <div class="tool-action-bar">
+                <button id="btn-bg-remove" class="btn-primary" disabled>Remove Background</button>
+                <div id="bg-status" class="tool-status hidden"></div>
+                <div id="bg-result" class="hidden" style="text-align: center; margin-top: 0.5rem;">
+                    <button id="btn-bg-download" class="btn-success">Download Transparent PNG</button>
+                </div>
             </div>
         </div>
 
