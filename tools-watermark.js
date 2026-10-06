@@ -33,17 +33,30 @@ export function initWatermarkTools() {
     });
     fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
 
-    // Live update preview
-    if (opacityInput && opacityVal) {
-        opacityInput.addEventListener('input', () => {
-            opacityVal.textContent = `${Math.round(opacityInput.value * 100)}%`;
-            updatePreview();
-        });
+    // Helper to detect if watermark fill is bright/light
+    function isLightColor(hex) {
+        if (!hex || !hex.startsWith('#')) return true;
+        let c = hex.substring(1);
+        if (c.length === 3) c = c.split('').map(x => x + x).join('');
+        const r = parseInt(c.substr(0, 2), 16) || 255;
+        const g = parseInt(c.substr(2, 2), 16) || 255;
+        const b = parseInt(c.substr(4, 2), 16) || 255;
+        return (r * 299 + g * 587 + b * 114) / 1000 > 128;
     }
-    if (textInput) textInput.addEventListener('input', updatePreview);
-    if (colorInput) colorInput.addEventListener('input', updatePreview);
-    if (posSelect) posSelect.addEventListener('change', updatePreview);
-    if (sizeSelect) sizeSelect.addEventListener('change', updatePreview);
+
+    // Live update preview on both input and change events
+    ['input', 'change'].forEach(evt => {
+        if (opacityInput) {
+            opacityInput.addEventListener(evt, () => {
+                if (opacityVal) opacityVal.textContent = `${Math.round(opacityInput.value * 100)}%`;
+                updatePreview();
+            });
+        }
+        if (textInput) textInput.addEventListener(evt, updatePreview);
+        if (colorInput) colorInput.addEventListener(evt, updatePreview);
+        if (posSelect) posSelect.addEventListener(evt, updatePreview);
+        if (sizeSelect) sizeSelect.addEventListener(evt, updatePreview);
+    });
 
     function handleFiles(files) {
         const valid = Array.from(files).filter(f => f.type.startsWith('image/'));
@@ -127,46 +140,78 @@ export function initWatermarkTools() {
         ctx.fillStyle = color;
         ctx.globalAlpha = opacity;
 
-        const metrics = ctx.measureText(text);
-        const textW = metrics.width;
-        const textH = fontSize;
+        const isLight = isLightColor(color);
+        const strokeColor = isLight ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.7)';
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = Math.max(2, Math.round(fontSize * 0.07));
 
-        let x = width - textW - 20;
-        let y = height - 20;
+        // Margin scales dynamically with image size (min 16px, ~4% of image min dimension)
+        const margin = Math.max(16, Math.round(Math.min(width, height) * 0.04));
 
-        if (pos === 'center') {
-            x = (width - textW) / 2;
-            y = (height + textH) / 2;
-        } else if (pos === 'bottom-left') {
-            x = 20;
-            y = height - 20;
-        } else if (pos === 'top-right') {
-            x = width - textW - 20;
-            y = textH + 20;
-        } else if (pos === 'top-left') {
-            x = 20;
-            y = textH + 20;
-        } else if (pos === 'tile') {
-            // Diagonal repeating tile
-            ctx.rotate(-Math.PI / 6);
-            ctx.globalAlpha = opacity * 0.4;
-            const stepX = textW * 2;
-            const stepY = textH * 4;
-            for (let tx = -width; tx < width * 2; tx += stepX) {
-                for (let ty = -height; ty < height * 2; ty += stepY) {
+        let x = 0;
+        let y = 0;
+
+        if (pos === 'tile') {
+            // Diagonal repeating pattern across the entire canvas
+            ctx.save();
+            ctx.translate(width / 2, height / 2);
+            ctx.rotate(-Math.PI / 7); // ~-25 degrees
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.globalAlpha = opacity * 0.45;
+
+            const metrics = ctx.measureText(text);
+            const textW = metrics.width;
+            const diag = Math.sqrt(width * width + height * height);
+            const stepX = Math.max(textW + 60, 160);
+            const stepY = Math.max(fontSize * 3.5, 90);
+
+            for (let tx = -diag; tx <= diag; tx += stepX) {
+                for (let ty = -diag; ty <= diag; ty += stepY) {
+                    ctx.strokeText(text, tx, ty);
                     ctx.fillText(text, tx, ty);
                 }
             }
             ctx.restore();
+            ctx.restore();
             return;
         }
 
-        // Draw shadow for readability
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-        ctx.shadowBlur = 6;
-        ctx.shadowOffsetX = 2;
-        ctx.shadowOffsetY = 2;
+        if (pos === 'center') {
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            x = width / 2;
+            y = height / 2;
+        } else if (pos === 'bottom-left') {
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'bottom';
+            x = margin;
+            y = height - margin;
+        } else if (pos === 'bottom-right') {
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'bottom';
+            x = width - margin;
+            y = height - margin;
+        } else if (pos === 'top-left') {
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            x = margin;
+            y = margin;
+        } else if (pos === 'top-right') {
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'top';
+            x = width - margin;
+            y = margin;
+        }
 
+        // Draw shadow for readability
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+        ctx.shadowBlur = 4;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
+
+        // Draw stroke outline first, then fill text
+        ctx.strokeText(text, x, y);
         ctx.fillText(text, x, y);
         ctx.restore();
     }

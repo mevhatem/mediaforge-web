@@ -12,6 +12,58 @@ const initializedTools = new Set();
 export function initSuiteRouter() {
     const navLinks = document.querySelectorAll('.nav-tab-btn');
     const toolWorkspaces = document.querySelectorAll('.tool-workspace');
+    const suiteNav = document.getElementById('suite-nav');
+    const btnNavPrev = document.getElementById('btn-nav-prev');
+    const btnNavNext = document.getElementById('btn-nav-next');
+
+    // 1. Arrow Button Controls
+    if (btnNavPrev && suiteNav) {
+        btnNavPrev.addEventListener('click', () => {
+            suiteNav.scrollBy({ left: -200, behavior: 'smooth' });
+        });
+    }
+    if (btnNavNext && suiteNav) {
+        btnNavNext.addEventListener('click', () => {
+            suiteNav.scrollBy({ left: 200, behavior: 'smooth' });
+        });
+    }
+
+    // 2. Mouse Wheel Scroll (Translates vertical wheel to horizontal scroll on PC)
+    if (suiteNav) {
+        suiteNav.addEventListener('wheel', (e) => {
+            if (e.deltaY !== 0) {
+                e.preventDefault();
+                suiteNav.scrollLeft += e.deltaY;
+            }
+        }, { passive: false });
+
+        // 3. Mouse Drag-to-Scroll (Desktop grab and swipe)
+        let isDown = false;
+        let startX = 0;
+        let startScrollLeft = 0;
+
+        suiteNav.addEventListener('mousedown', (e) => {
+            isDown = true;
+            suiteNav.classList.add('grabbing');
+            startX = e.pageX - suiteNav.offsetLeft;
+            startScrollLeft = suiteNav.scrollLeft;
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isDown) {
+                isDown = false;
+                suiteNav.classList.remove('grabbing');
+            }
+        });
+
+        suiteNav.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - suiteNav.offsetLeft;
+            const walk = (x - startX) * 1.5;
+            suiteNav.scrollLeft = startScrollLeft - walk;
+        });
+    }
 
     function switchTool(toolId) {
         if (!toolId) toolId = 'converter';
@@ -24,8 +76,13 @@ export function initSuiteRouter() {
 
         // Update nav buttons
         navLinks.forEach(btn => {
-            if (btn.dataset.tool === toolId) btn.classList.add('active');
-            else btn.classList.remove('active');
+            if (btn.dataset.tool === toolId) {
+                btn.classList.add('active');
+                // Scroll button into view inside suiteNav
+                btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            } else {
+                btn.classList.remove('active');
+            }
         });
 
         // Update workspaces

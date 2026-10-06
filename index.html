@@ -102,15 +102,19 @@
             <p class="subtitle">MediaForge — 100% Private In-Browser Media & File Converter</p>
 
             <!-- MediaForge Suite Navigation Tabs -->
-            <nav class="suite-nav">
-                <button class="nav-tab-btn active" data-tool="converter"><span class="nav-icon">⚡</span> Converter</button>
-                <button class="nav-tab-btn" data-tool="pdf"><span class="nav-icon">📑</span> PDF Merge</button>
-                <button class="nav-tab-btn" data-tool="heic"><span class="nav-icon">🍏</span> HEIC to JPG</button>
-                <button class="nav-tab-btn" data-tool="exif"><span class="nav-icon">🛡️</span> Privacy Stripper</button>
-                <button class="nav-tab-btn" data-tool="watermark"><span class="nav-icon">💧</span> Watermark Studio</button>
-                <button class="nav-tab-btn" data-tool="ocr"><span class="nav-icon">🔍</span> OCR Scanner</button>
-                <button class="nav-tab-btn" data-tool="bgremover"><span class="nav-icon">✨</span> Background Remover</button>
-            </nav>
+            <div class="suite-nav-container">
+                <button type="button" class="nav-scroll-btn nav-scroll-left" id="btn-nav-prev" title="Scroll left" aria-label="Previous tools">‹</button>
+                <nav class="suite-nav" id="suite-nav">
+                    <button class="nav-tab-btn active" data-tool="converter"><span class="nav-icon">⚡</span> Converter</button>
+                    <button class="nav-tab-btn" data-tool="pdf"><span class="nav-icon">📑</span> PDF Merge</button>
+                    <button class="nav-tab-btn" data-tool="heic"><span class="nav-icon">🍏</span> HEIC to JPG</button>
+                    <button class="nav-tab-btn" data-tool="exif"><span class="nav-icon">🛡️</span> Privacy Stripper</button>
+                    <button class="nav-tab-btn" data-tool="watermark"><span class="nav-icon">💧</span> Watermark Studio</button>
+                    <button class="nav-tab-btn" data-tool="ocr"><span class="nav-icon">🔍</span> OCR Scanner</button>
+                    <button class="nav-tab-btn" data-tool="bgremover"><span class="nav-icon">✨</span> Background Remover</button>
+                </nav>
+                <button type="button" class="nav-scroll-btn nav-scroll-right" id="btn-nav-next" title="Scroll right" aria-label="Next tools">›</button>
+            </div>
         </header>
 
         <!-- Workspace 1: Media & Document Converter -->
@@ -528,16 +532,19 @@
 
             <div class="tool-controls-grid">
                 <div class="control-group">
-                    <label for="ocr-language">Document Language</label>
+                    <label for="ocr-language">Document Language / Belge Dili</label>
                     <select id="ocr-language" class="select-input">
-                        <option value="tur+eng" selected>Turkish + English</option>
+                        <option value="tur" selected>Türkçe (Önerilen - En Yüksek İsabet)</option>
+                        <option value="tur+eng">Türkçe + İngilizce (Karma)</option>
                         <option value="eng">English</option>
-                        <option value="tur">Turkish</option>
                         <option value="deu">German (Deutsch)</option>
                         <option value="fra">French (Français)</option>
                         <option value="spa">Spanish (Español)</option>
-                        <option value="ara">Arabic</option>
+                        <option value="ara">Arabic (العربية)</option>
                     </select>
+                    <p style="font-size: 0.72rem; color: #9ca3af; margin-top: 0.35rem; line-height: 1.3;">
+                        💡 Türkçe belgelerde <strong>ş, ğ, ı, ö, ç, İ</strong> harflerinin hatasız taranması için <em>Türkçe</em> seçeneğini kullanın.
+                    </p>
                 </div>
             </div>
 
